@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preloaded_fonts" translatable="false">
+        <item>@font/akaya_telivigala</item>
+        <item>@font/allerta</item>
+        <item>@font/almendra_display</item>
+        <item>@font/amiko</item>
+        <item>@font/amita</item>
+        <item>@font/arima_madurai_thin</item>
+        <item>@font/atomic_age</item>
+        <item>@font/audiowide</item>
+        <item>@font/bangers</item>
+        <item>@font/bigshot_one</item>
+        <item>@font/pangolin</item>
+    </array>
+</resources>
