@@ -11,6 +11,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -18,7 +19,9 @@ import com.deeppowercrew.weathermexml.adapters.ViewPagerAdapter
 import com.deeppowercrew.weathermexml.data.WeatherModel
 import com.deeppowercrew.weathermexml.databinding.FragmentMainBinding
 import com.deeppowercrew.weathermexml.isPermissionsGranted
+import com.deeppowercrew.weathermexml.viewModel.MainViewModel
 import com.google.android.material.tabs.TabLayoutMediator
+import com.squareup.picasso.Picasso
 import org.json.JSONObject
 
 const val API_KEY = "9c4dca2eee744d2f9ba134332220209"
@@ -31,6 +34,7 @@ class MainFragment : Fragment() {
     )
     private lateinit var binding: FragmentMainBinding
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
+    private val model: MainViewModel by activityViewModels()
     private val tabsList = listOf(
         "Hours",
         "Days"
@@ -50,6 +54,7 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         checkPermissions()
         init()
+        updateHeadCard()
         requestWeatherData("Kyoto")
     }
 
@@ -61,6 +66,19 @@ class MainFragment : Fragment() {
         }.attach()
     }
 
+
+    private fun updateHeadCard() = with(binding) {
+        model.liveDataCurrent.observe(viewLifecycleOwner){
+            val maxMinTemp = "${it.tempMax}°C / ${it.tempMin}°C"
+            textData.text = it.time
+            tvCity.text = it.city
+            textCurrentTemp.text = "${it.currentTemp}°C"
+            textCondition.text = it.condition
+            textTempMaxMin.text = maxMinTemp
+            Picasso.get().load("https:" + it.conditionIconUrl).into(imageWeather)
+
+        }
+    }
 
     private fun permissionListener() {
         permissionLauncher =
@@ -121,6 +139,7 @@ class MainFragment : Fragment() {
             weatherItem.hours
 
         )
+        model.liveDataCurrent.value = itemHeadCard
         Log.d("MyLog", "City: ${itemHeadCard.city}")
         Log.d("MyLog", "City: ${itemHeadCard.currentTemp}")
         Log.d("MyLog", "City: ${itemHeadCard.tempMax}")
