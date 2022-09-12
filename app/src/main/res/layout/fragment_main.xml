@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginEnd="4dp"
-        app:cardBackgroundColor="@color/Blue_Ultra"
+        app:cardBackgroundColor="@color/blue_ultra"
         app:cardCornerRadius="10dp"
         app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -140,13 +140,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:backgroundTint="@color/Blue_Ultra"
+        android:backgroundTint="@color/blue_ultra"
         app:layout_constraintEnd_toEndOf="@+id/cardView"
         app:layout_constraintStart_toStartOf="@+id/cardView"
         app:layout_constraintTop_toBottomOf="@+id/cardView"
         app:tabIndicatorColor="@color/white"
         app:tabSelectedTextColor="@color/white"
-        app:tabTextColor="@color/whiteAlpha">
+        app:tabTextColor="@color/white_alpha">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
@@ -161,6 +161,7 @@
     </com.google.android.material.tabs.TabLayout>
 
     <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="4dp"

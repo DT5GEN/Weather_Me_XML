@@ -8,13 +8,26 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import com.deeppowercrew.weathermexml.R
+import com.deeppowercrew.weathermexml.adapters.ViewPagerAdapter
 import com.deeppowercrew.weathermexml.databinding.FragmentMainBinding
 import com.deeppowercrew.weathermexml.isPermissionsGranted
+import com.google.android.material.tabs.TabLayoutMediator
 
 class MainFragment : Fragment() {
+    private val fragmentList = listOf(
+        HoursFragment.newInstance(),
+        DaysFragment.newInstance()
+    )
     private lateinit var binding: FragmentMainBinding
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
+    private val tabsList = listOf(
+        "Hours",
+        "Days"
+    )
 
 
     override fun onCreateView(
@@ -29,6 +42,15 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         checkPermissions()
+        init()
+    }
+
+    private fun init() = with (binding){
+        val adapter = ViewPagerAdapter(activity as AppCompatActivity, fragmentList)
+        viewPager.adapter = adapter
+        TabLayoutMediator(tabLayout, viewPager){
+tab ,pos -> tab.text = tabsList[pos]
+        }.attach()
     }
 
 

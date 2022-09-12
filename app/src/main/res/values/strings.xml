@@ -2,4 +2,8 @@
     <string name="app_name">Weather Me XML</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="fragment_main_text_view">Hello TEXT</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">HOURS FRAGMENT</string>
+    <string name="tabHours">Hours</string>
+    <string name="tabDays">Days</string>
 </resources>
