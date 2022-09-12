@@ -24,8 +24,7 @@ class MainFragment : Fragment() {
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
     private val tabsList = listOf(
         "Hours",
-        "Days"
-    )
+        "Days"    )
 
 
     override fun onCreateView(
