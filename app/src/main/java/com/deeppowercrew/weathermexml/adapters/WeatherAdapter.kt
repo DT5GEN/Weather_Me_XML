@@ -9,15 +9,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.deeppowercrew.weathermexml.R
 import com.deeppowercrew.weathermexml.data.WeatherModel
 import com.deeppowercrew.weathermexml.databinding.ListItemBinding
+import com.squareup.picasso.Picasso
 
 class WeatherAdapter  : ListAdapter<WeatherModel, WeatherAdapter.Holder>(Comparator()){
 
     class Holder(view: View) : RecyclerView.ViewHolder(view){
         val binding = ListItemBinding.bind(view)
         fun bind(item: WeatherModel) = with(binding){
+            val maxMinTemp = "${item.tempMax}°C / ${item.tempMin}°C"
             textDate.text = item.time
             textConrition.text = item.condition
-            textTemp.text = item.currentTemp
+            textTemp.text =item.currentTemp.ifEmpty { maxMinTemp }
+
+            Picasso.get().load("https:" + item.conditionIconUrl).into(imageWeatherIcon)
+
         }
     }
 
