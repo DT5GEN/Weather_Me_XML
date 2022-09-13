@@ -16,9 +16,11 @@ class WeatherAdapter  : ListAdapter<WeatherModel, WeatherAdapter.Holder>(Compara
     class Holder(view: View) : RecyclerView.ViewHolder(view){
         val binding = ListItemBinding.bind(view)
         fun bind(item: WeatherModel) = with(binding){
+            val maxMinTemp = "${item.tempMax}°C / ${item.tempMin}°C"
             textDate.text = item.time
             textConrition.text = item.condition
-            textTemp.text = "${item.currentTemp}°C"
+            textTemp.text =item.currentTemp.ifEmpty { maxMinTemp }
+
             Picasso.get().load("https:" + item.conditionIconUrl).into(imageWeatherIcon)
 
         }
