@@ -76,12 +76,14 @@
 
             <TextView
                 android:id="@+id/textCurrentTemp"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/audiowide"
                 android:text="22 C"
                 android:textColor="@color/white"
-                android:textSize="64sp"
+                android:gravity="center"
+                android:textSize="42sp"
+                android:maxLines="1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvCity" />

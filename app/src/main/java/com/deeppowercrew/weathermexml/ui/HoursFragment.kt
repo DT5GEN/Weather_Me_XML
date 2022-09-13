@@ -1,7 +1,6 @@
 package com.deeppowercrew.weathermexml.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -74,7 +73,7 @@ class HoursFragment : Fragment() {
 
     private fun initRecyclerView() = with(binding) {
         rcView.layoutManager = LinearLayoutManager(activity)
-        adapter = WeatherAdapter()
+        adapter = WeatherAdapter(null)
         rcView.adapter = adapter
 
 

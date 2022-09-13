@@ -7,15 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.deeppowercrew.weathermexml.R
 import com.deeppowercrew.weathermexml.adapters.WeatherAdapter
 import com.deeppowercrew.weathermexml.data.WeatherModel
 import com.deeppowercrew.weathermexml.databinding.FragmentDaysBinding
 import com.deeppowercrew.weathermexml.viewModel.MainViewModel
-import org.json.JSONArray
-import org.json.JSONObject
 
-class DaysFragment : Fragment() {
+class DaysFragment : Fragment(), WeatherAdapter.Listener {
     private lateinit var adapter: WeatherAdapter
     private lateinit var binding: FragmentDaysBinding
     private val model: MainViewModel by activityViewModels()
@@ -37,7 +34,7 @@ class DaysFragment : Fragment() {
     }
 
     private fun initDaysFragment() = with(binding) {
-        adapter = WeatherAdapter()
+        adapter = WeatherAdapter(this@DaysFragment)
         recyclerDays.layoutManager = LinearLayoutManager(activity)
         recyclerDays.adapter = adapter
     }
@@ -72,5 +69,9 @@ class DaysFragment : Fragment() {
 
         @JvmStatic
         fun newInstance() =       DaysFragment()
+    }
+
+    override fun onClick(item: WeatherModel) {
+        model.liveDataCurrent.value = item
     }
 }
