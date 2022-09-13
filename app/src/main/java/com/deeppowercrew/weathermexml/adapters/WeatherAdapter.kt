@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.deeppowercrew.weathermexml.R
 import com.deeppowercrew.weathermexml.data.WeatherModel
 import com.deeppowercrew.weathermexml.databinding.ListItemBinding
+import com.squareup.picasso.Picasso
 
 class WeatherAdapter  : ListAdapter<WeatherModel, WeatherAdapter.Holder>(Comparator()){
 
@@ -17,7 +18,9 @@ class WeatherAdapter  : ListAdapter<WeatherModel, WeatherAdapter.Holder>(Compara
         fun bind(item: WeatherModel) = with(binding){
             textDate.text = item.time
             textConrition.text = item.condition
-            textTemp.text = item.currentTemp
+            textTemp.text = "${item.currentTemp}°C"
+            Picasso.get().load("https:" + item.conditionIconUrl).into(imageWeatherIcon)
+
         }
     }
 
