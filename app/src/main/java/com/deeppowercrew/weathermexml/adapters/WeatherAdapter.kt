@@ -11,11 +11,21 @@ import com.deeppowercrew.weathermexml.data.WeatherModel
 import com.deeppowercrew.weathermexml.databinding.ListItemBinding
 import com.squareup.picasso.Picasso
 
-class WeatherAdapter  : ListAdapter<WeatherModel, WeatherAdapter.Holder>(Comparator()){
+class WeatherAdapter (val listener: Listener?) : ListAdapter<WeatherModel, WeatherAdapter.Holder>(Comparator()){
 
-    class Holder(view: View) : RecyclerView.ViewHolder(view){
+    class Holder(view: View, val listener: Listener?) : RecyclerView.ViewHolder(view){
+
         val binding = ListItemBinding.bind(view)
+        var itemTemporary: WeatherModel? = null
+
+        init {
+            itemView.setOnClickListener {
+                itemTemporary?.let { it1 -> listener?.onClick(it1) }
+            }
+        }
+
         fun bind(item: WeatherModel) = with(binding){
+            itemTemporary = item
             val maxMinTemp = "${item.tempMax}°C / ${item.tempMin}°C"
             textDate.text = item.time
             textConrition.text = item.condition
@@ -39,10 +49,15 @@ class WeatherAdapter  : ListAdapter<WeatherModel, WeatherAdapter.Holder>(Compara
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false)
-        return Holder(view)
+        return Holder(view, listener)
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         holder.bind(getItem(position))
     }
+
+    interface Listener{
+        fun onClick(item: WeatherModel)
+    }
+
 }

@@ -1,7 +1,12 @@
 package com.deeppowercrew.weathermexml.ui
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +15,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.android.volley.Request
@@ -19,7 +25,12 @@ import com.deeppowercrew.weathermexml.adapters.ViewPagerAdapter
 import com.deeppowercrew.weathermexml.data.WeatherModel
 import com.deeppowercrew.weathermexml.databinding.FragmentMainBinding
 import com.deeppowercrew.weathermexml.isPermissionsGranted
+import com.deeppowercrew.weathermexml.utils.DialogManager
 import com.deeppowercrew.weathermexml.viewModel.MainViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.material.tabs.TabLayoutMediator
 import com.squareup.picasso.Picasso
 import org.json.JSONObject
@@ -28,6 +39,7 @@ const val API_KEY = "9c4dca2eee744d2f9ba134332220209"
 
 
 class MainFragment : Fragment() {
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val fragmentList = listOf(
         HoursFragment.newInstance(),
         DaysFragment.newInstance()
@@ -55,26 +67,89 @@ class MainFragment : Fragment() {
         checkPermissions()
         init()
         updateHeadCard()
-        requestWeatherData("Kyoto")
+        requestWeatherData("London")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkLocation()
     }
 
     private fun init() = with(binding) {
         val adapter = ViewPagerAdapter(activity as AppCompatActivity, fragmentList)
         viewPager.adapter = adapter
+        updateLocationData()
+
         TabLayoutMediator(tabLayout, viewPager) { tab, pos ->
             tab.text = tabsList[pos]
         }.attach()
+        ibRefresh.setOnClickListener {
+            tabLayout.selectTab(tabLayout.getTabAt(0))
+            checkLocation()
+        }
+        ibSearch.setOnClickListener {
+            DialogManager.searchCity(requireContext(), object : DialogManager.Listener{
+                override fun onClick(name: String?) {
+                    name?.let { it1 -> requestWeatherData(it1) }
+                }
+
+            })
+        }
+    }
+
+    private fun updateLocationData() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+    }
+
+    private fun isLocationEnabled(): Boolean {
+        val locationManager =
+            activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+    }
+
+    private fun getLocation() {
+
+        val cancellationToken = CancellationTokenSource()
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+
+            return Toast.makeText(requireContext(), "GPS blocked!", Toast.LENGTH_SHORT).show()
+        }
+        fusedLocationClient.getCurrentLocation(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            cancellationToken.token
+        ).addOnCompleteListener {
+            requestWeatherData("${it.result.latitude},${it.result.longitude}")
+        }
+    }
+
+    private fun checkLocation() {
+        if (isLocationEnabled()) {
+            getLocation()
+        } else {
+            DialogManager.locationSettingsDialog(requireContext(), object : DialogManager.Listener {
+                override fun onClick(name:String?) {
+                    startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                }
+            })
+        }
     }
 
 
     private fun updateHeadCard() = with(binding) {
-        model.liveDataCurrent.observe(viewLifecycleOwner){
-            val maxMinTemp = "${it.tempMax}°C / ${it.tempMin}°C"
+        model.liveDataCurrent.observe(viewLifecycleOwner) {
+            val maxMinTemp = "${it.tempMax}°C/ ${it.tempMin}°C"
             textData.text = it.time
             tvCity.text = it.city
-            textCurrentTemp.text = "${it.currentTemp}°C"
+            textCurrentTemp.text = it.currentTemp.ifEmpty { maxMinTemp }
             textCondition.text = it.condition
-            textTempMaxMin.text = maxMinTemp
+            textTempMaxMin.text = if (it.currentTemp.isEmpty()) "" else maxMinTemp
             Picasso.get().load("https:" + it.conditionIconUrl).into(imageWeather)
 
         }
@@ -131,7 +206,7 @@ class MainFragment : Fragment() {
             mainObject.getJSONObject("current").getString("last_updated"),
             mainObject.getJSONObject("current")
                 .getJSONObject("condition").getString("text"),
-            mainObject.getJSONObject("current").getString("temp_c"),
+            mainObject.getJSONObject("current").getString("temp_c").toFloat().toInt().toString(),
             weatherItem.tempMax,
             weatherItem.tempMin,
             mainObject.getJSONObject("current")
@@ -158,8 +233,8 @@ class MainFragment : Fragment() {
                 day.getString("date"),
                 day.getJSONObject("day").getJSONObject("condition").getString("text"),
                 "",
-                day.getJSONObject("day").getString("maxtemp_c"),
-                day.getJSONObject("day").getString("mintemp_c"),
+                day.getJSONObject("day").getString("maxtemp_c").toFloat().toInt().toString(),
+                day.getJSONObject("day").getString("mintemp_c").toFloat().toInt().toString(),
                 day.getJSONObject("day").getJSONObject("condition").getString("icon"),
                 day.getJSONArray("hour").toString()
             )
